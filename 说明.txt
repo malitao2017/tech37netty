@@ -1,0 +1,70 @@
+
+主要是梳理整体逻辑
+
+
+参考netty权威指南
+
+环境要求：因为有aio即nio2.0，所以jdk1.7以上
+
+内容：
+n0bio 经典的jdk中基本的socket模型，即bio模式，同步阻塞式I/O编程
+	运行： TimeServer 和 TimeClient
+
+n1pio 在bio的基础上在服务端（TimeServer）增加线程池，叫伪异步I/O编程
+	运行： TimeServer 和 TimeClient
+
+n2nio jdk自带的nio编程技术较为详细的介绍和使用了：缓存区Buffer 通道channel 多路复用器Selector,详细编写编程过程
+	运行： TimeServer 和 TimeClient
+
+n3aio jdk1.7之后的nio 2.0称为aio，简化nio，不需要多路复用器，用TimeClient做突破口比较容易理解
+	运行： TimeServer 和 TimeClient
+	
+以上的内容之引入jdk即可运行，是jdk原生的nio技术，不要netty的相关jar包
+	运行： TimeServer 和 TimeClient
+
+
+n4basic netty的入门案例 
+chapter3
+使用jar包： netty-all-5.0.0.Alpha1.jar
+
+n5frame.n1fault  tcp的拆包粘包问题，编写效果应该是交互100条信息
+chapter4.1
+
+n5frame.n2correct  解决tcp的拆包粘包问题，编写效果是交互100条信息，
+		方式：LineBasedFrameDecoder+StringDecoder增加两个解码器，服务端的信息处理也不需要考虑读半包2问题和如utf-8的编码问题
+		lineb解码器是基于"\n"或"\r\n"来解码；有最大长度，若连续读到最大长度也没有发现换行符，会抛出异常，忽略读到的异常流
+		Stringd是将接收的对象转化为字符串
+		这两个组合是常见的文本解码器
+chapter4.3
+
+解码器常用四种方式：
+1.消息长度固定 : FixedLengthFrameDecoder(使用telnet命令行调试)
+2.回车换行符作为结束符 ：LineBasedFrameDecoder
+3.特殊分隔符作为结束标志 ：DelimiterBasedFrameDecoder
+4.消息头中定义长度字符来标识消息的总长度
+
+n5frame.n3delimiter 分隔符作为结束标志的解码器
+	注：ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, delimiter));
+	的长度设置，是最大长度，一次的读取中若是没有分隔符，就丢弃并抛出异常
+chapter5.1
+
+n5frame.n4fixedLen 固定长度进行解析，案例使用cmd的telnet命令运行测试，设置为20
+	命令： telnet localhost 8080
+	输入： malitao welcome to Netty at beijing 
+	后台：只能按20字符的长度分隔
+chapter5.2
+
+n6codec.n1serializable java原生自带序列化的效率太低，生成的文件过大
+n6codec.n1serializable.netty 使用的netty自带的对象序列化解码器：ObjectDecoder和ObjectEncoder
+chapter6.1
+
+n6codec.n2messagepack 经过试验，书中的解码器不能使用！ 网上找的内容缺少这一章节源码，故下载需要的jar，案例自己书写补充
+所需jar包：javassist-3.9.0.GA.jar 和 msgpack-0.6.6.jar
+chapter7
+
+n6codec.n3protobuf google protobuf编解码
+所需jar包：protobuf-java-2.5.0.jar 
+chapter8 
+
+
+
