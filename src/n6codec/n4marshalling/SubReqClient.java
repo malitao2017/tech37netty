@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package n6codec.n1serializable.netty;
+package n6codec.n4marshalling;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -23,9 +23,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 
 /**
  * @author lilinfeng
@@ -39,14 +36,12 @@ public class SubReqClient {
 		EventLoopGroup group = new NioEventLoopGroup();
 		try {
 			Bootstrap b = new Bootstrap();
-			b.group(group)
-				.channel(NioSocketChannel.class)
-				.option(ChannelOption.TCP_NODELAY, true)
-				.handler(new ChannelInitializer<SocketChannel>() {
+			b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true)
+					.handler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						public void initChannel(SocketChannel ch) throws Exception {
-							ch.pipeline().addLast(new ObjectDecoder(1024,ClassResolvers.cacheDisabled(this.getClass().getClassLoader())));
-							ch.pipeline().addLast(new ObjectEncoder());
+							ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingDecoder());
+							ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingEncoder());
 							ch.pipeline().addLast(new SubReqClientHandler());
 						}
 					});
@@ -67,6 +62,7 @@ public class SubReqClient {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+		System.out.println("客户端部分");
 		int port = 8080;
 		if (args != null && args.length > 0) {
 			try {

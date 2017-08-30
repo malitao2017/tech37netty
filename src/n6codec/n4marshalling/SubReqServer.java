@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package n6codec.n3protobuf;
+package n6codec.n4marshalling;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -23,10 +23,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.protobuf.ProtobufDecoder;
-import io.netty.handler.codec.protobuf.ProtobufEncoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
@@ -46,14 +42,9 @@ public class SubReqServer {
 					.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						public void initChannel(SocketChannel ch) {
-							//读半包问题的处理
-							ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
-							//解码器对于 Rep的请求对象
-							ch.pipeline().addLast(new ProtobufDecoder(SubscribeReqProto.SubscribeReq.getDefaultInstance()));
-							//继承netty的通用解码器
-							ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
-							//编码器
-							ch.pipeline().addLast(new ProtobufEncoder());
+							//添加marshalling的编解码方法
+							ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingDecoder());
+							ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingEncoder());
 							ch.pipeline().addLast(new SubReqServerHandler());
 						}
 					});
@@ -71,6 +62,7 @@ public class SubReqServer {
 	}
 
 	public static void main(String[] args) throws Exception {
+		System.out.println("服务器部分");
 		int port = 8080;
 		if (args != null && args.length > 0) {
 			try {

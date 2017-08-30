@@ -62,9 +62,17 @@ n6codec.n2messagepack 经过试验，书中的解码器不能使用！ 网上找
 所需jar包：javassist-3.9.0.GA.jar 和 msgpack-0.6.6.jar
 chapter7
 
-n6codec.n3protobuf google protobuf编解码
+n6codec.n3protobuf 需要对于使用的类都进行加工才能使用；google protobuf编解码
+读半包处理：ProtobufVarint32FrameDecoder
 所需jar包：protobuf-java-2.5.0.jar 
 chapter8 
+编解码参考：E:\中-Java\14书netty\第8章Google Protobuf
 
+n6codec.n4marshalling 只需要添加过滤编解码器即可，JBoss Marshalling 的编解码技术，使用的pojo是通用的 n6codec.pojo下的两个实体类
+所需jar包：jboss-marshalling-1.3.0.CR9.jar  protobuf-java-2.5.0.jar
+chapter9 
+
+n7protocol.n1http.n1fileServer 是http的协议开发
+chapter10
 
 

@@ -44,10 +44,13 @@ public class SubReqClient {
 					.handler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						public void initChannel(SocketChannel ch) throws Exception {
+							//处理读半包问题
 							ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
-							ch.pipeline().addLast(
-									new ProtobufDecoder(SubscribeRespProto.SubscribeResp.getDefaultInstance()));
+							//客户端对 Resp的解码处理
+							ch.pipeline().addLast(new ProtobufDecoder(SubscribeRespProto.SubscribeResp.getDefaultInstance()));
+							//继承netty的通用的半包解码器
 							ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
+							//编码器
 							ch.pipeline().addLast(new ProtobufEncoder());
 							ch.pipeline().addLast(new SubReqClientHandler());
 						}

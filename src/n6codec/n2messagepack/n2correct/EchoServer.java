@@ -33,17 +33,19 @@ public class EchoServer {
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
-//						// LengthFieldBasedFrameDecoder用于处理半包消息
+						// LengthFieldBasedFrameDecoder用于处理半包消息
 						// 这样后面的MsgpackDecoder接收的永远是整包消息
 //						ch.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(65535, 0, 2, 0, 2));
-//						ch.pipeline().addLast("msgpack decoder", new MsgPackDecoder());
-//						// 在ByteBuf之前增加2个字节的消息长度字段
+						//msgPack的解码器
+						ch.pipeline().addLast("msgpack decoder", new MsgPackDecoder());
+						// 在ByteBuf之前增加2个字节的消息长度字段
 //						ch.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
-//						ch.pipeline().addLast("msgpack encoder", new MsgpackEncoder());
+						//msgPack的编码器
+						ch.pipeline().addLast("msgpack encoder", new MsgpackEncoder());
 						
 						//经过试验，书中的messagePack的解码器不能使用，只能参考n6codec.n1serializable.netty中的解码器案例
-						ch.pipeline().addLast(new ObjectDecoder(1024,ClassResolvers.cacheDisabled(this.getClass().getClassLoader())));
-						ch.pipeline().addLast(new ObjectEncoder());
+//						ch.pipeline().addLast(new ObjectDecoder(1024,ClassResolvers.cacheDisabled(this.getClass().getClassLoader())));
+//						ch.pipeline().addLast(new ObjectEncoder());
 						
 						ch.pipeline().addLast(new EchoServerHandler());
 					}
